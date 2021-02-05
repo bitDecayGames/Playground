@@ -1,5 +1,7 @@
 package states;
 
+import flixel.math.FlxPoint;
+import flixel.tweens.FlxTween;
 import openfl.display.BlendMode;
 import flixel.system.FlxAssets.FlxShader;
 import openfl.filters.ShaderFilter;
@@ -18,64 +20,56 @@ import flixel.FlxState;
 using extensions.FlxStateExt;
 
 class PlayState extends FlxState {
-	public var one:FlxSprite;
-	public var two:FlxSprite;
-	public var three:FlxSprite;
-
 	public var defaultCam:FlxCamera;
 	public var outlineCam:FlxCamera;
 	public var outlineSprite:FlxSprite;
 
-	var size = 50;
+	var width = 256;
+	var height = 224;
 
 	override public function create() {
 		super.create();
 
-		defaultCam = new FlxCamera(0, 0, size, size);
+		defaultCam = new FlxCamera(0, 0, width, height);
 		defaultCam.bgColor = FlxColor.BLACK;
+		// defaultCam.pixelPerfectRender = true;
 
-		outlineCam = new FlxCamera(0, size, size, size);
+		outlineCam = new FlxCamera(0, height, width, height);
 		outlineCam.bgColor = FlxColor.TRANSPARENT;
+		// outlineCam.pixelPerfectRender = true;
 		outlineCam.x = 0;
-		outlineCam.y = size;
+		outlineCam.y = height;
 
 		FlxG.cameras.reset(defaultCam);
 		FlxG.cameras.add(outlineCam);
 
-		one = new FlxSprite();
-		one.makeGraphic(10, 10, FlxColor.BLUE);
-		one.setPosition(20, 20);
-		one.camera = outlineCam;
-		add(one);
-
-		two = new FlxSprite();
-		two.makeGraphic(20, 20, FlxColor.BROWN);
-		two.setPosition(25, 25);
-		two.camera = outlineCam;
-		two.angle = 35;
-		add(two);
-
-		three = new FlxSprite();
-		three.makeGraphic(25, 25, FlxColor.BROWN);
-		three.setPosition(30, 30);
-		three.camera = outlineCam;
-		add(three);
+		for (i in 0...30) {
+			var size = FlxG.random.int(10, 30);
+			var spr = new FlxSprite();
+			spr.makeGraphic(size, size, FlxColor.BLUE);
+			spr.setPosition(FlxG.random.int(0, width), FlxG.random.int(0, height));
+			spr.camera = outlineCam;
+			add(spr);
+			FlxTween.linearPath(spr,
+				[
+					new FlxPoint(FlxG.random.int(0, width), FlxG.random.int(0, height)),
+					new FlxPoint(FlxG.random.int(0, width), FlxG.random.int(0, height))
+				],
+				20,
+				false,
+				{ type: FlxTweenType.LOOPING});
+		}
 
 		outlineSprite = new FlxSprite();
 		outlineSprite.useFramePixels = true;
-		outlineSprite.antialiasing = false;
 		outlineSprite.makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
+		outlineSprite.shader = new Outline(0xFFFFFFFF, 2, 2);
 		outlineSprite.camera = defaultCam;
 		add(outlineSprite);
 	}
 
 	override public function update(elapsed:Float) {
 		super.update(elapsed);
-
-		one.angle++;
-		two.angle--;
-
-		three.setPosition(FlxG.mouse.x, FlxG.mouse.y);
 
 		outlineSprite.makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
 		outlineSprite.drawFrame();
