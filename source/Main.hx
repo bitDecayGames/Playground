@@ -17,6 +17,11 @@ class Main extends Sprite {
 		super();
 		FlxG.fixedTimestep = false;
 
+		// Sets the window size
+		FlxG.resizeWindow(800, 800);
+		// Sets the window to fullscreen
+		FlxG.fullscreen = true;
+
 		#if debug
 		FlxG.autoPause = false;
 		#end
